@@ -1,28 +1,27 @@
 
 import React from 'react';
 import { Star, Clock, Users } from 'lucide-react';
+import { Course } from '../types/database';
 
-interface CourseCardProps {
-  title: string;
-  author: string;
-  rating: number;
-  students: number;
-  duration: string;
-  price: number;
-  image: string;
+interface CourseCardProps extends Course {
+  onClick?: () => void;
 }
 
 const CourseCard = ({
   title,
   author,
   rating,
-  students,
+  students_count,
   duration,
   price,
-  image
+  image,
+  onClick
 }: CourseCardProps) => {
   return (
-    <div className="card-hover glass-card rounded-xl overflow-hidden">
+    <div 
+      className="card-hover glass-card rounded-xl overflow-hidden cursor-pointer"
+      onClick={onClick}
+    >
       <div className="relative aspect-video">
         <img 
           src={image} 
@@ -43,7 +42,7 @@ const CourseCard = ({
           </div>
           <div className="flex items-center gap-1">
             <Users size={16} />
-            {students}
+            {students_count}
           </div>
           <div className="flex items-center gap-1">
             <Clock size={16} />
@@ -61,3 +60,4 @@ const CourseCard = ({
 };
 
 export default CourseCard;
+

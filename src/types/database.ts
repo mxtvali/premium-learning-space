@@ -12,6 +12,12 @@ export interface Course {
   rating: number;
   students_count: number;
   created_at: string;
+  prerequisites?: string[];
+  learning_objectives?: string[];
+  target_audience?: string[];
+  teacher_id?: string;
+  published: boolean;
+  updated_at: string;
 }
 
 export interface Lesson {
@@ -49,3 +55,15 @@ export interface UserCourse {
   course_id: string;
   purchased_at: string;
 }
+
+export interface CourseEnrollment {
+  id: string;
+  course_id: string;
+  user_id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
+
+export type UserRole = 'student' | 'teacher' | 'admin';
+

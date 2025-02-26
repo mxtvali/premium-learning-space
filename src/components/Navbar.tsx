@@ -1,19 +1,31 @@
 
 import React from 'react';
-import { Search, User } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/clerk-react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
+  const { user, isSignedIn } = useUser();
+  const isTeacher = user?.publicMetadata?.role === 'teacher';
+  const isAdmin = user?.publicMetadata?.role === 'admin';
+
   return (
     <nav className="fixed w-full z-50 top-0 px-6 py-4 glass-card">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-12">
-          <a href="/" className="text-2xl font-display font-bold">
+          <Link to="/" className="text-2xl font-display font-bold">
             EduPro
-          </a>
+          </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="/courses" className="nav-link">Курсы</a>
-            <a href="/about" className="nav-link">О нас</a>
-            <a href="/pricing" className="nav-link">Цены</a>
+            <Link to="/courses" className="nav-link">Курсы</Link>
+            {isSignedIn && <Link to="/dashboard" className="nav-link">Дашборд</Link>}
+            {(isTeacher || isAdmin) && (
+              <Link to="/create-course" className="nav-link flex items-center gap-2">
+                <Plus size={20} />
+                Создать курс
+              </Link>
+            )}
+            {isAdmin && <Link to="/admin" className="nav-link">Админ панель</Link>}
           </div>
         </div>
         
@@ -27,11 +39,18 @@ const Navbar = () => {
             <Search className="absolute right-3 top-2.5 text-gray-400 h-5 w-5" />
           </div>
           
-          <button className="btn-secondary">Войти</button>
-          <button className="btn-primary flex items-center gap-2">
-            <User size={20} />
-            Регистрация
-          </button>
+          {!isSignedIn ? (
+            <>
+              <SignInButton mode="modal">
+                <button className="btn-secondary">Войти</button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="btn-primary">Регистрация</button>
+              </SignUpButton>
+            </>
+          ) : (
+            <UserButton afterSignOutUrl="/" />
+          )}
         </div>
       </div>
     </nav>
@@ -39,3 +58,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
