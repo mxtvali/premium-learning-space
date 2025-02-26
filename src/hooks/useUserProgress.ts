@@ -1,55 +1,69 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { UserProgress, UserCourse } from '../types/database';
-
-export const useUserCourses = (userId: string) => {
-  return useQuery({
-    queryKey: ['userCourses', userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*, course:courses(*)')
-        .eq('user_id', userId);
-
-      if (error) throw error;
-      return data as (UserCourse & { course: Course })[];
-    },
-    enabled: !!userId,
-  });
-};
+import { Course, UserProgress } from '../types/database';
+import { toast } from 'sonner';
 
 export const useUserProgress = (userId: string, courseId: string) => {
-  return useQuery({
-    queryKey: ['progress', userId, courseId],
+  const queryClient = useQueryClient();
+
+  const { data: progress } = useQuery({
+    queryKey: ['userProgress', userId, courseId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: course } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('id', courseId)
+        .single();
+
+      const { data: lessons } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order', { ascending: true });
+
+      const { data: progress } = await supabase
         .from('user_progress')
         .select('*')
         .eq('user_id', userId)
         .eq('course_id', courseId);
 
+      return {
+        course: course as Course,
+        lessons,
+        progress: progress as UserProgress[]
+      };
+    },
+    enabled: !!userId && !!courseId,
+  });
+
+  const updateProgress = useMutation({
+    mutationFn: async ({ lessonId, completed }: { lessonId: string; completed: boolean }) => {
+      const { error } = await supabase
+        .from('user_progress')
+        .upsert([
+          {
+            user_id: userId,
+            lesson_id: lessonId,
+            completed,
+            last_watched: new Date().toISOString(),
+          },
+        ]);
+
       if (error) throw error;
-      return data as UserProgress[];
     },
-    enabled: !!userId && !!courseId,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProgress', userId, courseId] });
+      toast.success('Прогресс обновлен');
+    },
+    onError: () => {
+      toast.error('Ошибка при обновлении прогресса');
+    },
   });
+
+  return {
+    progress,
+    updateProgress,
+  };
 };
 
-export const useHasPurchased = (userId: string, courseId: string) => {
-  return useQuery({
-    queryKey: ['hasPurchased', userId, courseId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('course_id', courseId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return !!data;
-    },
-    enabled: !!userId && !!courseId,
-  });
-};

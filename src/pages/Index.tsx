@@ -8,31 +8,52 @@ import Footer from '../components/Footer';
 
 const popularCourses = [
   {
+    id: "1",
     title: "Основы Web-разработки 2024",
     author: "Александр Петров",
+    description: "Полный курс по веб-разработке с нуля до профессионала",
     rating: 4.8,
-    students: 1234,
+    students_count: 1234,
     duration: "20 часов",
     price: 15000,
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+    level: "Начинающий",
+    category: "Программирование",
+    published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
+    id: "2",
     title: "UX/UI Дизайн с нуля до PRO",
     author: "Мария Иванова",
+    description: "Научитесь создавать современные интерфейсы",
     rating: 4.9,
-    students: 856,
+    students_count: 856,
     duration: "30 часов",
     price: 20000,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+    level: "Средний",
+    category: "Дизайн",
+    published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
+    id: "3",
     title: "Python для Data Science",
     author: "Дмитрий Соколов",
+    description: "Изучите анализ данных и машинное обучение",
     rating: 4.7,
-    students: 2341,
+    students_count: 2341,
     duration: "40 часов",
     price: 25000,
-    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
+    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+    level: "Продвинутый",
+    category: "Data Science",
+    published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   }
 ];
 
@@ -75,8 +96,8 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {popularCourses.map((course, index) => (
-              <CourseCard key={index} {...course} />
+            {popularCourses.map((course) => (
+              <CourseCard key={course.id} {...course} />
             ))}
           </div>
         </div>
@@ -104,3 +125,4 @@ const Index = () => {
 };
 
 export default Index;
+
